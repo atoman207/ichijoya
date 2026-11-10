@@ -1,0 +1,29 @@
+{
+  "name": "ichijoya",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@splidejs/splide": "^3.6.12",
+    "@splidejs/splide-extension-intersection": "^0.1.6",
+    "next": "16.4.6",
+    "nodemailer": "^7.0.6",
+    "parse5": "^7.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/nodemailer": "^7.0.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "typescript": "^5"
+  }
+}

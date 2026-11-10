@@ -1,0 +1,163 @@
+@charset "UTF-8";
+
+.l-header--sticky-v2{
+
+}
+
+.l-header--sticky-v2 .l-nav__item:not(.l-nav__item--btn){
+  width: 16rem;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn{
+  display: flex;
+  align-items: center;
+  width: auto;
+  padding: 0.5rem;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn-line{
+  padding-left: 2.8rem;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn:first-of-type{
+  margin-left: 2.3rem;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn + .l-nav__item--btn::before,
+.l-header--sticky-v2 .l-nav__item--btn + .l-nav__item--btn::after{
+
+  content: none;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn a{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  height: 3.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn a:hover{
+  opacity: 0.7;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn a::before{
+  content: none;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn a .l-nav__item-label{
+  height: auto;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn-line a{
+  width: 17rem;
+  background: #48af57;
+}
+
+.l-header--sticky-v2 .l-nav__item--btn-tel a{
+  width: 18.8rem;
+  background: #fdd000;
+}
+
+/* ヘッダー */
+.l-header-base__btn-v2{
+  
+}
+
+.l-header-base__btn-v2 a{
+  flex-direction: column;
+  align-items: center;
+  background: #48af57;
+  height: 10rem;
+}
+
+.l-header-base__btn-v2 a .icon{
+  margin-left: -5px;
+}
+
+.l-header-base__btn-v2 a .label{
+  margin: 1rem 0;
+}
+
+/* 画面下固定バー */
+.p-fixed-bar{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 99;
+  width: 100%;
+}
+@media (min-width:1024px){
+  .p-fixed-bar{
+    display: none;
+  }
+}
+
+.p-fixed-bar__list{
+  display: flex;
+  padding-left: 0;
+  list-style-type: none;
+  background: #fff;
+}
+
+.p-fixed-bar__list__item{
+  width: 50%;
+}
+
+.p-fixed-bar__link{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 6rem;
+  padding: 0.5rem 1rem;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.p-fixed-bar__link:hover{
+  opacity: 0.7;
+}
+
+.p-fixed-bar__link--line{
+  background: #48af57;
+}
+
+.p-fixed-bar__link--tel{
+  background: #fdd000;
+}
+
+.p-fixed-bar__link__label{
+  
+}
+
+@media (max-width:1023px){
+  .l-footer{
+    padding-bottom: 60px;
+  }
+}
+
+/* 追加_20240402 */
+.p-kv__bnr{
+  position: absolute;
+  top: -0.2rem;
+  left: -0.2rem;
+  z-index: 1;
+}
+@media (min-width:768px){
+  .p-kv__bnr{
+    top: -0.3rem;
+    left: 4rem;
+  }
+}
+
+.p-kv__bnr__link{
+  display: block;
+}
+
+.p-kv__bnr__link img{
+  display: block;
+}
