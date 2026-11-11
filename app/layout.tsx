@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import BodyEnd from '@/components/layout/BodyEnd'
 import SvgFilters from '@/components/layout/SvgFilters'
+import ThemeBoot from '@/components/runtime/ThemeBoot'
 import ThemeRuntime from '@/components/runtime/ThemeRuntime'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
 
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SvgFilters />
         {children}
         <BodyEnd />
+        <ThemeBoot />
         <ThemeRuntime />
       </body>
     </html>

@@ -38,7 +38,10 @@ applies where WordPress loads it (single posts, category and date archives), via
 ### Behaviour (ported from the theme's `main.bundle.js` and plugins)
 
 `lib/theme/` contains the client-side modules; `components/runtime/ThemeRuntime.tsx` runs the
-site-wide ones and `PageRuntime.tsx` the page-specific ones:
+site-wide ones and `PageRuntime.tsx` the page-specific ones. What the theme does while the page is
+still being parsed (current-link classes, the contact form's agree state, starting the key visual)
+runs from an inline script at the end of `<body>` (`ThemeBoot.tsx`, `lib/theme/boot.ts`), as on
+WordPress, so it does not wait for React to hydrate:
 
 - drawer menu (focus trap, scroll lock, Esc, closes at ≥1024px), sticky nav / page-top button
   (`[data-view-over]` observers), current-page link marking, 900ms eased anchor scrolling
@@ -95,6 +98,24 @@ See `.env.example`. The important ones:
 | `ALLOW_INDEXING` | `false` | set `true` on production only; otherwise every page is `noindex` |
 | `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GA_ID` | empty | live site uses `GTM-5VPDRP2` / `G-TX05WFFEQK` |
 | `CONTACT_MODE` | `log` | `log` (nothing sent), `cf7` (forward to Contact Form 7 on WordPress — same mail settings as today), `smtp` |
+
+## Deploying to Vercel
+
+1. **Let the build reach the WordPress REST API.** Pages are prerendered from `/wp-json/` at build
+   time, and Vercel runs every build in the USA (Washington, D.C.). Xserver blocks `/wp-json/` for
+   addresses outside Japan by default, so WordPress answers 403 and the build stops (`next.config.ts`
+   checks this first and prints the reason). In the Xserver server panel, open
+   **WordPressセキュリティ設定 › 国外アクセス制限** for the domain and set **REST API アクセス制限** to
+   **OFF**. The other restrictions, including the dashboard (`/wp-admin`, `/wp-login.php`) and
+   XML-RPC, can stay ON. The REST API only serves content the site already shows publicly.
+   Xserver's whitelist is not an alternative, because Vercel builds have no fixed IP addresses.
+2. `vercel.json` runs the functions in Tokyo (`hnd1`), next to WordPress and to the visitors. The
+   Hobby plan allows one region.
+3. Set the environment variables in the Vercel project settings: `NEXT_PUBLIC_SITE_URL`, and for
+   production also `ALLOW_INDEXING=true`, `CONTACT_MODE` and the analytics IDs (see above).
+
+If the REST API restriction has to stay on, build on a machine in Japan and upload the result
+instead of building on Vercel: `vercel build --prod` then `vercel deploy --prebuilt --prod`.
 
 ## Notes
 

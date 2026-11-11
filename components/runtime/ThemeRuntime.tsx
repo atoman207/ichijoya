@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { themeBoot } from '@/lib/theme/boot'
 import type { Cleanup } from '@/lib/theme/dom'
 import { initFancybox } from '@/lib/theme/fancybox'
 import { initSmoothScroll } from '@/lib/theme/smoothScroll'
@@ -22,9 +23,11 @@ function initTelTracking(): Cleanup {
 }
 
 /**
- * Document-level behaviour from the theme's main.bundle.js. The modules bound to the page skeleton
- * run in <ShellRuntime/>, the page-specific ones (key visual fader, modals, sliders, contact form,
- * review widgets) in <PageRuntime/>.
+ * Document-level behaviour from the theme's main.bundle.js. What the theme does while the page is
+ * parsed (current links, agree state, key visual fader) already ran from <ThemeBoot/> in
+ * production; themeBoot() covers development builds. The modules bound to the page skeleton run in
+ * <ShellRuntime/>, the page-specific ones (modals, sliders, contact form, review widgets) in
+ * <PageRuntime/>.
  *
  * Links are plain <a> elements: like on WordPress every page is a full document load. (With Cache
  * Components the App Router keeps up to three visited routes in the DOM, hidden, which the theme's
@@ -32,7 +35,7 @@ function initTelTracking(): Cleanup {
  */
 export default function ThemeRuntime() {
   useEffect(() => {
-    document.documentElement.classList.add('complete')
+    themeBoot()
     const cleanups = [initSmoothScroll(), initFancybox(), initTelTracking()]
     return () => cleanups.reverse().forEach((c) => c())
   }, [])

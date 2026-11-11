@@ -1,9 +1,12 @@
-import { htmlEl, matches, type Cleanup, type MQ } from './dom'
+import type { Cleanup } from './dom'
 
 /*
  * Cross-fade slideshow (LogicFader chunk). Configured through data-config, e.g.
  * "duration=3000&interval=6500&delay=0&easing=ease": every (delay + interval) ms the next slide
  * fades in over `duration` ms; hovering a slide pauses the rotation.
+ *
+ * initFader() is self-contained on purpose: <ThemeBoot/> inlines it with toString() so the key
+ * visual starts as early as with the theme, without waiting for React.
  */
 type Data = {
   duration: number
@@ -26,16 +29,27 @@ type Data = {
   navItems?: HTMLCollection
 }
 
-function parseConfig(s: string): Record<string, string> {
-  const out: Record<string, string> = {}
-  s.split('&').forEach((pair) => {
-    const [k, v] = pair.split('=')
-    out[decodeURIComponent(k)] = decodeURIComponent(v)
-  })
-  return out
-}
-
 export function initFader(target: HTMLElement): Cleanup {
+  const htmlEl = () => document.documentElement
+  const MQ: Record<string, string> = {
+    breakLg: '(max-width: 1023px)',
+    breakMd: '(max-width: 767px)',
+    breakSm: '(max-width: 639px)',
+    overSm: '(min-width: 640px)',
+    overMd: '(min-width: 768px)',
+    overLg: '(min-width: 1024px)',
+    landscape: '(orientation: landscape)',
+    portrait: '(orientation: portrait)',
+  }
+  const matches = (name: string) => !!MQ[name] && window.matchMedia(MQ[name]).matches
+  const parseConfig = (s: string) => {
+    const out: Record<string, string> = {}
+    s.split('&').forEach((pair) => {
+      const [k, v] = pair.split('=')
+      out[decodeURIComponent(k)] = decodeURIComponent(v)
+    })
+    return out
+  }
   const raw: Record<string, string> = { delay: '3500', duration: '1500', easing: 'ease', timeout: '0', stop: 'true' }
   const cfg = target.getAttribute('data-config')
   Object.assign(raw, cfg ? parseConfig(cfg) : {})
@@ -86,7 +100,7 @@ export function initFader(target: HTMLElement): Cleanup {
     target.style.transitionTimingFunction = 'ease-in-out'
     target.style.transitionProperty = 'height'
     target.style.transitionDuration = '.3s'
-    if (mq !== 'undefined') target.style.height = matches(mq as keyof typeof MQ) ? `${h}px` : 'auto'
+    if (mq !== 'undefined') target.style.height = matches(mq) ? `${h}px` : 'auto'
     else target.style.height = `${h}px`
   }
 

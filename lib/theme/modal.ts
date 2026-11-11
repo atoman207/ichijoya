@@ -32,18 +32,22 @@ function setupModal(trigger: HTMLElement): Cleanup {
   document.body.appendChild(modal)
 
   // preparation()
-  const target = document.querySelector<HTMLElement>(`[data-modal-target="${link}"]`)
-  const home = target ? { parent: target.parentNode as Node, next: target.nextSibling } : null
-  if (target) target.style.display = 'none'
+  const initial = document.querySelector<HTMLElement>(`[data-modal-target="${link}"]`)
+  const home = initial ? { el: initial, parent: initial.parentNode as Node, next: initial.nextSibling } : null
+  if (initial) initial.style.display = 'none'
 
+  // like the theme: the block is looked up again on every open and stays set after closing, and
+  // `status` never goes back to false, so closing keeps the frame height during the fade-out
+  let target: HTMLElement | null = null
+  let status = false
   let isOpen = false
   let scrollPos = 0
   let touchY: number | null = null
-  let closeTimer: ReturnType<typeof setTimeout> | undefined
+  const closeTimers = new Set<ReturnType<typeof setTimeout>>()
 
   const calcHeight = () => {
     frame.style.height = content.scrollHeight >= window.innerHeight ? '100%' : ''
-    if (!isOpen) frame.style.height = ''
+    if (!status) frame.style.height = ''
   }
   const onResize = () => {
     frame.style.height = content.scrollHeight >= window.innerHeight ? '100%' : ''
@@ -64,37 +68,40 @@ function setupModal(trigger: HTMLElement): Cleanup {
     if (e.key === 'Escape' && document.querySelector('.js-modal:not([aria-hidden="true"])')) doClose()
   }
 
-  const restoreTarget = () => {
-    if (!target || !home) return
-    target.style.display = 'none'
-    home.parent.insertBefore(target, home.next && home.next.parentNode === home.parent ? home.next : null)
-  }
-
   const doClose = () => {
-    if (!isOpen || !target) return
+    const block = target
+    if (!block) return
     isOpen = false
+    // the theme puts the block back into the first trigger that links to it, not where it came from
+    const link = block.getAttribute('data-modal-target')
+    const holder = document.querySelector(`[data-modal][data-modal-link="${link}"]`)
     modal.setAttribute('aria-hidden', 'true')
     calcHeight()
     trigger.focus()
-    closeTimer = setTimeout(() => {
-      restoreTarget()
+    const t = setTimeout(() => {
+      closeTimers.delete(t)
+      block.style.display = 'none'
       scrollingEl().scrollTop = scrollPos
       htmlEl().style.overflow = ''
       htmlEl().classList.remove('js-modal-opened')
+      holder?.insertAdjacentElement('beforeend', block)
       content.removeEventListener('touchstart', onTouchStart)
       content.removeEventListener('touchmove', onTouchMove)
       filter.removeEventListener('touchmove', onTouchMoveBackdrop)
       window.removeEventListener(resizeEventName(), onResize)
     }, 550)
+    closeTimers.add(t)
   }
 
   const open = (e: Event) => {
     e.preventDefault()
-    if (!target) return
-    clearTimeout(closeTimer)
+    target = document.querySelector<HTMLElement>(`[data-modal-target="${trigger.getAttribute('data-modal-link')}"]`)
+    // fixedBodyPosition() runs before the block is checked
     scrollPos = scrollingEl().scrollTop
     htmlEl().classList.add('js-modal-opened')
     htmlEl().style.overflow = 'hidden'
+    if (!target) return
+    status = true
     isOpen = true
     target.style.display = ''
     modal.removeAttribute('aria-hidden')
@@ -123,15 +130,18 @@ function setupModal(trigger: HTMLElement): Cleanup {
   filter.setAttribute('tabindex', '-1')
 
   return () => {
-    clearTimeout(closeTimer)
+    closeTimers.forEach(clearTimeout)
     trigger.removeEventListener('click', open)
     window.removeEventListener(resizeEventName(), onResize)
     if (isOpen) {
       htmlEl().style.overflow = ''
       htmlEl().classList.remove('js-modal-opened')
     }
-    restoreTarget()
-    if (target) target.style.display = ''
+    // back to the server-rendered position and style
+    if (home) {
+      home.parent.insertBefore(home.el, home.next && home.next.parentNode === home.parent ? home.next : null)
+      home.el.style.display = ''
+    }
     modal.remove()
   }
 }
